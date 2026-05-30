@@ -1,0 +1,17 @@
+{
+  "name": "kitchen-chaos",
+  "version": "1.0.0",
+  "description": "Kitchen Chaos - Overcooked-style co-op cooking game for mobile (2.5D). Play with friends online or with AI chefs.",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "socket.io": "^4.8.3"
+  },
+  "author": "",
+  "license": "MIT"
+}
