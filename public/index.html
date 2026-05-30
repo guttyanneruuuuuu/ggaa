@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1a1030" />
+  <title>Kitchen Chaos 🍳 — みんなで協力おりょうり</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 縦持ち警告 -->
+  <div id="rotate-hint">
+    <div class="rotate-icon">📱<span class="arrow">↻</span></div>
+    <p>スマホを<strong>横向き</strong>にしてね！</p>
+    <small>協力おりょうりゲーム Kitchen Chaos</small>
+  </div>
+
+  <!-- ============ メインメニュー ============ -->
+  <section id="screen-menu" class="screen active">
+    <div class="menu-bg"></div>
+    <div class="floaty f1">🍅</div><div class="floaty f2">🥕</div>
+    <div class="floaty f3">🍔</div><div class="floaty f4">🥗</div>
+    <div class="floaty f5">🍳</div><div class="floaty f6">🐟</div>
+    <div class="menu-card">
+      <h1 class="logo">🍳 KITCHEN <span>CHAOS</span></h1>
+      <p class="tagline">なかまと協力して オーダーをさばけ！</p>
+
+      <div class="name-row">
+        <label>なまえ</label>
+        <input id="player-name" maxlength="8" placeholder="シェフの名前" />
+      </div>
+
+      <div class="menu-buttons">
+        <button id="btn-ai" class="btn btn-primary">
+          <span class="btn-emoji">🤖</span> AIとプレイ
+        </button>
+        <button id="btn-create" class="btn btn-secondary">
+          <span class="btn-emoji">👥</span> 友達とルームを作る
+        </button>
+        <button id="btn-join" class="btn btn-secondary">
+          <span class="btn-emoji">🔗</span> ルームに参加
+        </button>
+      </div>
+
+      <div id="join-box" class="join-box hidden">
+        <input id="join-code" maxlength="4" placeholder="コード4文字" autocapitalize="characters" />
+        <button id="btn-join-go" class="btn btn-primary">参加</button>
+      </div>
+      <p id="menu-error" class="error-msg"></p>
+    </div>
+    <footer class="credit">2.5D Co-op Cooking · タップ＆スワイプで操作</footer>
+  </section>
+
+  <!-- ============ ロビー ============ -->
+  <section id="screen-lobby" class="screen">
+    <div class="lobby-card">
+      <div class="lobby-head">
+        <h2>ルーム <span id="lobby-code" class="code-badge">----</span></h2>
+        <p class="lobby-hint" id="lobby-mode-hint"></p>
+      </div>
+
+      <div class="share-row" id="share-row">
+        <button id="btn-copy" class="btn btn-small">📋 招待リンクをコピー</button>
+        <span id="copy-done" class="copy-done"></span>
+      </div>
+
+      <div class="lobby-cols">
+        <div class="lobby-col">
+          <h3>ステージをえらぶ</h3>
+          <div class="level-buttons" id="level-buttons"></div>
+        </div>
+        <div class="lobby-col">
+          <h3>シェフたち <span id="player-count"></span></h3>
+          <div id="player-list" class="player-list"></div>
+          <div class="lobby-actions">
+            <button id="btn-add-ai" class="btn btn-tiny">＋ AIシェフ</button>
+            <button id="btn-remove-ai" class="btn btn-tiny">－ AI削除</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lobby-bottom">
+        <button id="btn-leave" class="btn btn-ghost">退出</button>
+        <button id="btn-start" class="btn btn-primary btn-big">スタート！🔥</button>
+      </div>
+      <p id="lobby-note" class="lobby-note"></p>
+    </div>
+  </section>
+
+  <!-- ============ ゲーム ============ -->
+  <section id="screen-game" class="screen">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- 上部HUD -->
+    <div id="hud-top">
+      <div class="hud-orders" id="hud-orders"></div>
+      <div class="hud-right">
+        <div class="hud-timer" id="hud-timer">00:00</div>
+        <div class="hud-score">
+          <span class="score-label">SCORE</span>
+          <span id="hud-score">0</span>
+          <span class="score-target" id="hud-target"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- コンボ/通知トースト -->
+    <div id="toast-zone"></div>
+
+    <!-- 操作: 左ジョイスティック -->
+    <div id="joystick" class="joystick">
+      <div class="joy-base"><div class="joy-knob" id="joy-knob"></div></div>
+    </div>
+
+    <!-- 操作: 右ボタン -->
+    <div id="action-buttons">
+      <button id="btn-dash" class="action-btn dash">ダッシュ</button>
+      <button id="btn-act" class="action-btn act">つかむ / おく</button>
+    </div>
+
+    <!-- カウントダウン -->
+    <div id="countdown" class="countdown hidden"></div>
+  </section>
+
+  <!-- ============ リザルト ============ -->
+  <section id="screen-result" class="screen">
+    <div class="result-card">
+      <h2 id="result-title">クリア！</h2>
+      <div class="stars" id="result-stars"></div>
+      <div class="result-score">
+        <span id="result-score">0</span>
+        <small>/ 目標 <span id="result-target">0</span></small>
+      </div>
+      <p id="result-msg" class="result-msg"></p>
+      <div class="result-buttons">
+        <button id="btn-again" class="btn btn-primary">もう一度！</button>
+        <button id="btn-home" class="btn btn-ghost">ホームへ</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
