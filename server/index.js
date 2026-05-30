@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { Room } from './game/Room.js';
-import { LEVELS } from './game/config.js';
+import { LEVELS, RECIPES, INGREDIENTS, CHOP_TIME, COOK_TIME, BURN_TIME } from './game/config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +24,22 @@ const io = new Server(server, { cors: { origin: '*' } });
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 app.use(express.static(PUBLIC_DIR));
 app.get('/health', (_req, res) => res.json({ ok: true, rooms: rooms.size }));
+
+// クライアントが必要とするゲームデータ(レベル一覧・レシピ・食材)を配信
+app.get('/api/gamedata', (_req, res) => {
+  res.json({
+    levels: LEVELS.map((l, i) => ({
+      index: i,
+      name: l.name,
+      duration: l.duration,
+      targetScore: l.targetScore,
+      recipes: l.recipes,
+    })),
+    recipes: RECIPES,
+    ingredients: INGREDIENTS,
+    cookTime: COOK_TIME, burnTime: BURN_TIME, chopTime: CHOP_TIME,
+  });
+});
 
 // ---------- ルーム管理 ----------
 const rooms = new Map();  // code -> Room
